@@ -1,19 +1,20 @@
 param config object
+param onlySpokeTemplates bool = false
 
 // Determine the location based on the resource group
 var location = resourceGroup().location
 var shortLocation = config.regionPrefixLookup[location]
 
 // Create hub network security groups
-resource nsg_hubVnetNvaSubnetManagement 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
+resource nsg_hubVnetNvaSubnetManagement 'Microsoft.Network/networkSecurityGroups@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-${config.hub.nvaManagementSubnet.name}-nsg'
 }
-resource nsg_hubVnetNvaSubnetDiagnostic 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
+resource nsg_hubVnetNvaSubnetDiagnostic 'Microsoft.Network/networkSecurityGroups@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-${config.hub.nvaDiagnosticSubnet.name}-nsg'
 }
-resource nsg_hubVnetNvaSubnetInternal 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
+resource nsg_hubVnetNvaSubnetInternal 'Microsoft.Network/networkSecurityGroups@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-${config.hub.nvaInternalSubnet.name}-nsg'
   properties: {
@@ -38,7 +39,7 @@ resource nsg_hubVnetNvaSubnetInternal 'Microsoft.Network/networkSecurityGroups@2
     ]
   }
 }
-resource nsg_hubVnetNvaSubnetPublic 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
+resource nsg_hubVnetNvaSubnetPublic 'Microsoft.Network/networkSecurityGroups@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-${config.hub.nvaPublicSubnet.name}-nsg'
   properties: {
@@ -59,11 +60,11 @@ resource nsg_hubVnetNvaSubnetPublic 'Microsoft.Network/networkSecurityGroups@202
     ]
   }
 }
-resource nsg_hubVnetVmSubnet1 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
+resource nsg_hubVnetVmSubnet1 'Microsoft.Network/networkSecurityGroups@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-${config.hub.vmSubnet1.name}-nsg'
 }
-resource nsg_hubVnetVmSubnet2 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
+resource nsg_hubVnetVmSubnet2 'Microsoft.Network/networkSecurityGroups@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-${config.hub.vmSubnet2.name}-nsg'
 }

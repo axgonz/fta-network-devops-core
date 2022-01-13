@@ -112,7 +112,7 @@ jobs:
         id: deployaue
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: aue-main-${{ steps.date.outputs.date }}
+          deploymentName: aue-core-net-${{ steps.date.outputs.date }}
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiaeast
@@ -122,23 +122,23 @@ jobs:
         id: deployase
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: ase-main-${{ steps.date.outputs.date }}
+          deploymentName: ase-core-net-${{ steps.date.outputs.date }}
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiasoutheast
           template: dst/main.json  
 
       - name: Display aue template outputs
-        run: echo ${{ steps.deployaue.outputs }}
+        run: echo ${{ steps.deployaue.outputs.vnetId_hub.value }}
 
       - name: Display ase template outputs
-        run: echo ${{ steps.deployase.outputs }}       
+        run: echo ${{ steps.deployase.outputs.vnetId_hub.value }}       
 
       - name: Peer aue hub to ase hub
         id: peerauetoase
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: aue-peerhubs-${{ steps.date.outputs.date }}
+          deploymentName: aue-core-net-peerhubs-${{ steps.date.outputs.date }}
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiaeast
@@ -149,9 +149,36 @@ jobs:
         id: peerasetoaue
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: ase-peerhubs-${{ steps.date.outputs.date }}
+          deploymentName: ase-core-net-peerhubs-${{ steps.date.outputs.date }}
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiasoutheast
           template: dst/tools/peerVnetById/main.json
-          parameters: vnetId=${{ steps.deployase.outputs.vnetId_hub.value }} remoteVnetId=${{ steps.deployaue.outputs.vnetId_hub.value }}   
+          parameters: vnetId=${{ steps.deployase.outputs.vnetId_hub.value }} remoteVnetId=${{ steps.deployaue.outputs.vnetId_hub.value }}
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_APPA }}      
+
+      - name: Seed APPA aue subscription
+        id: seedappaaue
+        uses: azure/arm-deploy@v1
+        with:
+          deploymentName: aue-core-net-${{ steps.date.outputs.date }}
+          scope: subscription
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_APPA }}
+          region: australiaeast
+          template: dst/main.json
+          parameters: onlySpokeTemplates=true
+
+      - name: Seed APPA ase subscription
+        id: seedappaaue
+        uses: azure/arm-deploy@v1
+        with:
+          deploymentName: ase-core-net-${{ steps.date.outputs.date }}
+          scope: subscription
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_APPA }}
+          region: australiasoutheast
+          template: dst/main.json
+          parameters: onlySpokeTemplates=true              

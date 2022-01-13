@@ -1,4 +1,5 @@
 param config object
+param onlySpokeTemplates bool = false
 
 // Determine the location based on the resource group
 var location = resourceGroup().location
@@ -40,7 +41,7 @@ var routesSpokeVnets = [for destinationVnet in config.spokes._routeViaNva: {
 }]
 
 // Create hub route tables
-resource rt_hubVnetGatewaySubnet 'Microsoft.Network/routeTables@2021-02-01' = {
+resource rt_hubVnetGatewaySubnet 'Microsoft.Network/routeTables@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-GatewaySubnet-rt'
   properties: {
@@ -50,7 +51,7 @@ resource rt_hubVnetGatewaySubnet 'Microsoft.Network/routeTables@2021-02-01' = {
 }
 
 var filteredRoutes1 = [for route in routesHubVmSubnets: (route.properties.addressPrefix != config.hub.vmSubnet1.prefix) ? route : routesDefault[0]]
-resource rt_hubVnetVmSubnet1 'Microsoft.Network/routeTables@2021-02-01' = {
+resource rt_hubVnetVmSubnet1 'Microsoft.Network/routeTables@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-${config.hub.vmSubnet1.name}-rt'
   properties: {
@@ -60,7 +61,7 @@ resource rt_hubVnetVmSubnet1 'Microsoft.Network/routeTables@2021-02-01' = {
 }
 
 var filteredRoutes2 = [for route in routesHubVmSubnets: (route.properties.addressPrefix != config.hub.vmSubnet2.prefix) ? route : routesDefault[0]]
-resource rt_hubVnetVmSubnet2 'Microsoft.Network/routeTables@2021-02-01' = {
+resource rt_hubVnetVmSubnet2 'Microsoft.Network/routeTables@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${shortLocation}-hub-${config.hub.vmSubnet2.name}-rt'
   properties: {

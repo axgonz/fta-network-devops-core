@@ -1,5 +1,7 @@
 targetScope = 'subscription'
 
+param onlySpokeTemplates bool = false
+
 var configText = loadTextContent('./main.config.json')
 var configInit = json(configText)
 
@@ -28,10 +30,11 @@ module depCoreNet 'resourceGroups/core-net/network.bicep' = {
   scope: rgCoreNet
   params: {
     config: config
+    onlySpokeTemplates: onlySpokeTemplates
   }
 }
 
-module depCoreNetPeerings 'resourceGroups/core-net/peerings.bicep' = {
+module depCoreNetPeerings 'resourceGroups/core-net/peerings.bicep' = if (!onlySpokeTemplates) {
   name: '${rgCoreNet.name}-peerings'
   scope: rgCoreNet
   params: {
@@ -44,7 +47,7 @@ module depCoreNetPeerings 'resourceGroups/core-net/peerings.bicep' = {
   ]
 } 
 
-// module depCoreNetGateway 'resourceGroups/core-net/gateway.bicep' = {
+// module depCoreNetGateway 'resourceGroups/core-net/gateway.bicep' = if (!onlySpokeTemplates) {
 //   name: '${rgCoreNet.name}-gateway'
 //   scope: rgCoreNet
 //   params: {
@@ -52,7 +55,7 @@ module depCoreNetPeerings 'resourceGroups/core-net/peerings.bicep' = {
 //   }
 // }
 
-// module depCoreNetBastion 'resourceGroups/core-net/bastion.bicep' = {
+// module depCoreNetBastion 'resourceGroups/core-net/bastion.bicep' = if (!onlySpokeTemplates) {
 //   name: '${rgCoreNet.name}-bastion'
 //   scope: rgCoreNet
 //   params: {
@@ -60,7 +63,7 @@ module depCoreNetPeerings 'resourceGroups/core-net/peerings.bicep' = {
 //   }
 // }
 
-// module depCoreNetFirewall'resourceGroups/core-net/firewall.bicep' = {
+// module depCoreNetFirewall'resourceGroups/core-net/firewall.bicep' = if (!onlySpokeTemplates) {
 //   name: '${rgCoreNet.name}-firewall'
 //   scope: rgCoreNet
 //   params: {

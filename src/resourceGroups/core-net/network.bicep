@@ -2,6 +2,7 @@
 // https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/resource-declaration
 
 param config object
+param onlySpokeTemplates bool = false
 
 // Determine the location based on the resource group
 var location = resourceGroup().location
@@ -10,6 +11,7 @@ module nsgs 'nsgs.bicep' = {
   name: '${deployment().name}-nsgs'
   params: {
     config: config
+    onlySpokeTemplates: onlySpokeTemplates  
   }
 }
 
@@ -17,11 +19,12 @@ module udrs 'udrs.bicep' = {
   name: '${deployment().name}-udrs'
   params: {
     config: config
+    onlySpokeTemplates: onlySpokeTemplates
   }
 }
 
 // Create hub virtual network
-resource vnet_hub 'Microsoft.Network/virtualNetworks@2021-02-01' = {
+resource vnet_hub 'Microsoft.Network/virtualNetworks@2021-02-01' = if (!onlySpokeTemplates) {
   location: location
   name: '${config.hub.name}'
   properties: {
