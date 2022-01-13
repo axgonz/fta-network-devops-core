@@ -7,7 +7,7 @@ on:
     branches:
       - main
     paths:
-      - '/src/*'
+      - 'src/*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -35,14 +35,14 @@ jobs:
 
       - name: Build bicep files
         run: |
-          mkdir /dst
+          mkdir dst
           bicep build /src/main.bicep --outdir dst 
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: arm-templates
-          path: /dst
+          path: dst
 
   dev:
     name: Deploy to dev
@@ -57,7 +57,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: arm-templates
-          path: /dst
+          path: dst
 
       - name: Deploy
         run: echo deploying to dev
@@ -75,7 +75,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: arm-templates
-          path: /dst
+          path: dst
 
       - name: Deploy
         run: echo deploying to uat
@@ -92,7 +92,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: arm-templates
-          path: /dst
+          path: dst
 
       - name: Login to Azure
         uses: azure/login@v1
@@ -105,7 +105,7 @@ jobs:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiaeast
-          template: /dst/main.json
+          template: dst/main.json
 
       - name: Deploy to Australia Southeast region
         uses: azure/arm-deploy@v1
@@ -113,7 +113,7 @@ jobs:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiasoutheast
-          template: /dst/main.json  
+          template: dst/main.json  
 
       - name: Display template output 
         run: echo ${{ steps.deploy.outputs }}
