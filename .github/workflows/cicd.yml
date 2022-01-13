@@ -2,7 +2,11 @@ name: cicd
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow or pull request events but only for the main branch for changes in the 'src' folder
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/*'
   pull_request:
     branches:
       - main
@@ -59,7 +63,7 @@ jobs:
           name: arm-templates
           path: dst
 
-      - name: Deploy
+      - name: Deploy to Australia East region
         run: echo deploying to dev
 
   uat:
@@ -77,7 +81,7 @@ jobs:
           name: arm-templates
           path: dst
 
-      - name: Deploy
+      - name: Deploy to Australia East region
         run: echo deploying to uat
 
   prd:
