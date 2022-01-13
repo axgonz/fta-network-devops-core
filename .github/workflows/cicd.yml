@@ -1,6 +1,5 @@
 name: cicd
 
-# Controls when the workflow will run
 on:
   push:
     branches:
@@ -40,8 +39,9 @@ jobs:
 
       - name: Build bicep files
         run: |
-          mkdir dst
+          mkdir -p dst/tools/peerVnetById
           bicep build src/main.bicep --outdir dst 
+          bicep build src/tools/peerVnetById/main.bicep --outdir dst/tools/peerVnetById
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -109,6 +109,7 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y%m%d%H%M')"
 
       - name: Deploy to Australia East region
+        id: deployaue
         uses: azure/arm-deploy@v1
         with:
           deploymentName: aue-main-${{ steps.date.outputs.date }}
@@ -118,6 +119,7 @@ jobs:
           template: dst/main.json
 
       - name: Deploy to Australia Southeast region
+        id: deployase
         uses: azure/arm-deploy@v1
         with:
           deploymentName: ase-main-${{ steps.date.outputs.date }}
@@ -126,5 +128,30 @@ jobs:
           region: australiasoutheast
           template: dst/main.json  
 
-      - name: Display template output 
-        run: echo ${{ steps.deploy.outputs }}
+      - name: Display aue template outputs
+        run: echo ${{ steps.deployaue.outputs }}
+
+      - name: Display ase template outputs
+        run: echo ${{ steps.deployase.outputs }}       
+
+      - name: Peer aue hub to ase hub
+        id: peerauetoase
+        uses: azure/arm-deploy@v1
+        with:
+          deploymentName: aue-peerhubs-${{ steps.date.outputs.date }}
+          scope: subscription
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+          region: australiaeast
+          template: dst/tools/peerVnetById/main.json
+          parameters: vnetId=${{ steps.deployaue.outputs.vnetId_hub.value }} remoteVnetId=${{ steps.deployase.outputs.vnetId_hub.value }}
+
+      - name: Peer ase hub to aue hub
+        id: peerasetoaue
+        uses: azure/arm-deploy@v1
+        with:
+          deploymentName: ase-peerhubs-${{ steps.date.outputs.date }}
+          scope: subscription
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+          region: australiasoutheast
+          template: dst/tools/peerVnetById/main.json
+          parameters: vnetId=${{ steps.deployase.outputs.vnetId_hub.value }} remoteVnetId=${{ steps.deployaue.outputs.vnetId_hub.value }}   
