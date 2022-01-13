@@ -6,7 +6,7 @@ param allowGatewayTransit bool = false
 param useRemoteGateways bool = false
 
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
-  name: last(split(vnetId,'/'))[4]
+  name: split(vnetId,'/')[4]
 }
 
 module dep 'peerings.bicep' = {
