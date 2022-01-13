@@ -135,7 +135,6 @@ jobs:
         run: echo ${{ steps.deployase.outputs.vnetId_hub.value }}       
 
       - name: Peer aue hub to ase hub
-        id: peerauetoase
         uses: azure/arm-deploy@v1
         with:
           deploymentName: aue-core-net-peerhubs-${{ steps.date.outputs.date }}
@@ -146,7 +145,6 @@ jobs:
           parameters: vnetId=${{ steps.deployaue.outputs.vnetId_hub.value }} remoteVnetId=${{ steps.deployase.outputs.vnetId_hub.value }}
 
       - name: Peer ase hub to aue hub
-        id: peerasetoaue
         uses: azure/arm-deploy@v1
         with:
           deploymentName: ase-core-net-peerhubs-${{ steps.date.outputs.date }}
@@ -162,7 +160,6 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS_APPA }}      
 
       - name: Seed APPA aue subscription
-        id: seedappaaue
         uses: azure/arm-deploy@v1
         with:
           deploymentName: aue-core-net-${{ steps.date.outputs.date }}
@@ -173,7 +170,6 @@ jobs:
           parameters: onlySpokeTemplates=true
 
       - name: Seed APPA ase subscription
-        id: seedappaaue
         uses: azure/arm-deploy@v1
         with:
           deploymentName: ase-core-net-${{ steps.date.outputs.date }}
