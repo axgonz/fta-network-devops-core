@@ -36,7 +36,7 @@ jobs:
       - name: Build bicep files
         run: |
           mkdir dst
-          bicep build /src/main.bicep --outdir dst 
+          bicep build src/main.bicep --outdir dst 
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
