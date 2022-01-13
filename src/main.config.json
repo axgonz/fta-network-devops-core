@@ -75,24 +75,21 @@
     "spokes": {
         "spoke1": {
             "name": "${shortLocation}-spoke1",
-            "prefix": "${octet1}.${octet2}.4.0/24",
-            "id": "/subscriptions/c39328d8-5527-4feb-ac72-095166e1dd40/resourceGroups/auc-app-hrweb/providers/Microsoft.Network/virtualNetworks/auc-app-hrweb"
+            "prefix": "${octet1}.${octet2}.4.0/24"
         },
         "spoke2": {
             "name": "${shortLocation}-spoke2",
-            "prefix": "",
-            "id": ""
+            "prefix": "${octet1}.${octet2}.5.0/24"
         },
         "spoke3": {
             "name": "${shortLocation}-spoke3",
-            "prefix": "",
-            "id": ""
+            "prefix": ""
         },
         "_routeViaNva": [
-            "spoke1"
+            "spoke1",
+            "spoke2"
         ],
         "_peerToHub": [
-            "spoke1"
         ]       
     },
     "routeTableNextHop": "afw"
