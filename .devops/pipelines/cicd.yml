@@ -64,6 +64,7 @@ stages:
             deploy:
               steps:
                 - script: echo $(environmentName)
+                - script: cat $(System.DefaultWorkingDirectory)/src/main.bicep
                 - task: AzureCLI@2
                   inputs:
                     azureSubscription: AzureServiceConnection
