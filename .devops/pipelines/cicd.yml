@@ -10,10 +10,15 @@
 # Integrate Bicep with Azure Pipelines
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/add-template-to-azure-pipelines?tabs=CLI
 
-name: cicd
+parameters:
+  - name: cicd
 
-pr:
-  autoCancel: true
+resources:
+  repositories:
+    - repository: cicd
+      type: github
+
+trigger:
   branches:
     include:
       - main
@@ -25,8 +30,26 @@ pool:
   vmImage: ubuntu-latest
   
 stages:
+  - stage: build
+    jobs:
+      - job:
+        steps:
+          - checkout: self
+            displayName: "Checkout source repository."
+
+          - script: curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64 ; chmod +x ./bicep ; sudo mv ./bicep /usr/local/bin/bicep ; bicep --version
+            displayName: "Install Bicep."
+
+          - script: mkdir $(System.DefaultWorkingDirectory)/dst ; bicep build src/main.bicep --outdir dst 
+            displayName: "Build ARM Templates."
+
+          - publish: $(System.DefaultWorkingDirectory)/dst
+            displayName: "Publish build artifacts."
+            artifact: armtemplates
+
   - stage: dev
-    dependsOn: []
+    dependsOn:
+      - build
     variables:
       - group: dev
     jobs:
@@ -37,9 +60,11 @@ stages:
             deploy:
               steps:
                 - script: echo $(environmentName)
+                  displayName: "Example build step."    
 
   - stage: uat
-    dependsOn: []
+    dependsOn:
+      - build
     variables:
       - group: uat
     jobs:
@@ -49,7 +74,8 @@ stages:
           runOnce:
             deploy:
               steps:
-                - script: echo $(environmentName)      
+                - script: echo $(environmentName) 
+                  displayName: "Example build step."    
 
   - stage: prd
     dependsOn: 
@@ -63,13 +89,15 @@ stages:
           runOnce:
             deploy:
               steps:
-                - script: echo $(environmentName)
-                - script: cat $(System.DefaultWorkingDirectory)/README.md
+                - download: current
+                  displayName: "Download build artifacts."
+                  artifact: armtemplates
                 - task: AzureCLI@2
+                  displayName: "Create ARM deployment."
                   inputs:
                     azureSubscription: AzureServiceConnection
                     scriptLocation: inlineScript
                     scriptType: bash
                     workingDirectory: $(System.DefaultWorkingDirectory)
                     inlineScript: |
-                      az deployment sub create --subscription $(subscriptionId) --location $(location) --template-file src/main.bicep
+                      az deployment sub create --subscription $(subscriptionId) --location $(location) --template-file dst/main.bicep
