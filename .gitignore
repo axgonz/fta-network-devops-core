@@ -1,3 +1,4 @@
 dst
 *.json
 !*.config.json
+!.vscode/settings.json

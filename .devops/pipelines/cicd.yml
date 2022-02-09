@@ -1,1 +1,74 @@
+# pipeline definition
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/pipeline?view=azure-pipelines#remarks
+
+# pr trigger
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/pr?view=azure-pipelines#pr-autocancel-branches-paths-drafts
+
+# variable groups
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml
+
+# Integrate Bicep with Azure Pipelines
+# https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/add-template-to-azure-pipelines?tabs=CLI
+
 name: cicd
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/*
+
+pool: 
+  vmImage: ubuntu-latest
+  
+stages:
+  - stage: dev
+    dependsOn: []
+    variables:
+      - group: dev
+    jobs:
+      - deployment:
+        environment: dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: echo $(environmentName)
+
+  - stage: uat
+    dependsOn: []
+    variables:
+      - group: uat
+    jobs:
+      - deployment:      
+        environment: uat
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: echo $(environmentName)      
+
+  - stage: prd
+    dependsOn: 
+      - uat
+    variables:
+      - group: prd
+    jobs:
+      - deployment:      
+        environment: prd
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: echo $(environmentName)
+                - task: AzureCLI@2
+                  inputs:
+                    azureSubscription: $(azureServiceConnectionName)
+                    scriptLocation: inlineScript
+                    scriptType: bash
+                    workingDirectory: $(System.DefaultWorkingDirectory)
+                    inlineScript: |
+                      az deployment sub create --subscription $(subscriptionId) --location $(location) --template-file src/main.bicep
