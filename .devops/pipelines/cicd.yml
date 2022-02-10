@@ -13,11 +13,6 @@
 parameters:
   - name: cicd
 
-resources:
-  repositories:
-    - repository: cicd
-      type: github
-
 trigger:
   branches:
     include:
