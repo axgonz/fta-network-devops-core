@@ -10,8 +10,7 @@
 # Integrate Bicep with Azure Pipelines
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/add-template-to-azure-pipelines?tabs=CLI
 
-parameters:
-  - name: cicd
+name: cicd
 
 trigger:
   branches:
