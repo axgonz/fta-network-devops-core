@@ -34,7 +34,7 @@ stages:
           - script: mkdir dist ; bicep build src/main.bicep --outdir dist 
             displayName: "Build ARM Templates (main)."
 
-          - script: mkdir dist/tools/peerVnetById ; bicep build src/tools/peerVnetById/main.bicep --outdir dist/tools/peerVnetById
+          - script: mkdir -p dist/tools/peerVnetById ; bicep build src/tools/peerVnetById/main.bicep --outdir dist/tools/peerVnetById
             displayName: "Build ARM Templates (tools)."            
 
           - publish: dist
