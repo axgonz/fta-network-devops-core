@@ -93,4 +93,4 @@ stages:
                     scriptLocation: inlineScript
                     scriptType: bash
                     inlineScript: |
-                      az deployment sub create --subscription $(subscriptionId) --location $(location) --template-file ../armtemplates/main.json
+                      az deployment sub create --subscription $(subscriptionId) --location $(location) --template-file ../armtemplates/main.json --name main-$(location)
