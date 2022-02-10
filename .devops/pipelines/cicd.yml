@@ -31,12 +31,15 @@ stages:
           - script: curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64 ; chmod +x ./bicep ; sudo mv ./bicep /usr/local/bin/bicep ; bicep --version
             displayName: "Install Bicep."
 
-          - script: mkdir $(System.DefaultWorkingDirectory)/dst ; bicep build src/main.bicep --outdir dst 
-            displayName: "Build ARM Templates."
+          - script: mkdir dist ; bicep build src/main.bicep --outdir dist 
+            displayName: "Build ARM Templates (main)."
 
-          - publish: $(System.DefaultWorkingDirectory)/dst
+          - script: mkdir dist/tools/peerVnetById ; bicep build src/tools/peerVnetById/main.bicep --outdir dist/tools/peerVnetById
+            displayName: "Build ARM Templates (tools)."            
+
+          - publish: dist
             displayName: "Publish build artifacts."
-            artifact: armtemplates
+            artifact: armtemplates     
 
   - stage: dev
     dependsOn:
@@ -83,13 +86,11 @@ stages:
                 - download: current
                   displayName: "Download build artifacts."
                   artifact: armtemplates
-                  target: dst
                 - task: AzureCLI@2
                   displayName: "Create ARM deployment."
                   inputs:
                     azureSubscription: AzureServiceConnection
                     scriptLocation: inlineScript
                     scriptType: bash
-                    workingDirectory: $(System.DefaultWorkingDirectory)
                     inlineScript: |
-                      az deployment sub create --subscription $(subscriptionId) --location $(location) --template-file dst/main.bicep
+                      az deployment sub create --subscription $(subscriptionId) --location $(location) --template-file armtemplates/main.bicep

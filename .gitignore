@@ -1,4 +1,4 @@
-dst
+dist
 *.json
 !*.config.json
 !.vscode/settings.json
