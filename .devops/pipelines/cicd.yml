@@ -28,12 +28,6 @@ stages:
     jobs:
       - job:
         steps:
-          - script: cat $(System.DefaultWorkingDirectory)/README.md
-            displayName: "Dump README.md"
-          # - checkout: self
-          #   name: "axgonz/fta-network-devops-core"
-          #   displayName: "Checkout source repository."
-
           - script: curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64 ; chmod +x ./bicep ; sudo mv ./bicep /usr/local/bin/bicep ; bicep --version
             displayName: "Install Bicep."
 
@@ -89,6 +83,7 @@ stages:
                 - download: current
                   displayName: "Download build artifacts."
                   artifact: armtemplates
+                  target: dst
                 - task: AzureCLI@2
                   displayName: "Create ARM deployment."
                   inputs:
