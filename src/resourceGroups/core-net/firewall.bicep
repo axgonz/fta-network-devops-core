@@ -1,83 +1,54 @@
-targetScope = 'subscription'
+param config object
+param location string = resourceGroup().location
 
-param location string = 'australiacentral'
+var shortLocation = config.regionPrefixLookup[location]
+var name = 'azfw1'
 
-// Lookup region code based on location parameter
-var regionCodeLookup = {
-  australiacentral: 'auc'
-  australiaeast: 'aue'
-  australiasoutheast: 'ase'
+resource vnetHub 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
+  name: '${config.hub.name}'
 }
-var shortLocation = regionCodeLookup[location]
 
-// Lookup region prefix based on location parameter
-var regionPrefixLookup = {
-  australiacentral: '10.0.0.0/16'
-  australiaeast: '10.1.0.0/16'
-  australiasoutheast: '10.2.0.0/16'
+module fwPols 'firewall/policies.bicep' = {
+  name: '${name}-policies'
 }
-var regionAddressPrefix = regionPrefixLookup[location]
 
-// Get the needed octets to handle different address spaces for each region
-var octet1 = int(split(regionAddressPrefix, '.')[0])
-var octet2 = int(split(regionAddressPrefix, '.')[1])
-
-/* 
-  IMPORTANT
-    Update this list each time a new spoke is created
-*/
-var regionSpokes = [
-  {
-    name: '${shortLocation}-spoke1'
-    prefix: '${octet1}.${octet2}.4.0/24'
-    isStandalone: false
-  }
-  {
-    name: '${shortLocation}-spoke2'
-    prefix: '${octet1}.${octet2}.5.0/25'
-    isStandalone: false
-  }
-  {
-    name: '${shortLocation}-spoke3'
-    prefix: '${octet1}.${octet2}.5.128/26'
-    isStandalone: false
-  }
-  {
-    name: '${shortLocation}-spokeN'
-    prefix: '${octet1}.${octet2}.255.0/24'
-    isStandalone: false
-  }
-]
-
-// Create core resource groups and update their deployment
-resource rgCoreNet 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: '${shortLocation}-core-net'
+resource ipFirewall 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
+  name: '${shortLocation}-${name}-ip'
   location: location
-}
-
-module depCoreNet 'core-net/main.bicep' = {
-  name: '${rgCoreNet.name}'
-  scope: rgCoreNet
-  params: {
-    shortLocation: shortLocation
-    regionAddressPrefix: regionAddressPrefix
-    regionSpokes: regionSpokes
+  sku: {
+    name: 'Standard'
+    tier: 'Regional'
+  }
+  properties: {
+    publicIPAddressVersion: 'IPv4'
+    publicIPAllocationMethod: 'Static'
+    idleTimeoutInMinutes: 4
   }
 }
 
-resource rgCoreNetBastion 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: '${shortLocation}-core-net-bastion'
+resource firewall 'Microsoft.Network/azureFirewalls@2021-05-01' = {
+  name: name
   location: location
-  dependsOn: [
-    depCoreNet
-  ]
-}
-
-module depCoreNetBastion 'core-net-bastion/main.bicep' = {
-  name: '${rgCoreNetBastion.name}'
-  scope: rgCoreNetBastion
-  params: {
-    shortLocation: shortLocation
-    vnetId: depCoreNet.outputs.vnetHubId
+  properties: {
+    sku: {
+      name: 'AZFW_VNet'
+      tier: 'Standard'
+    }
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          publicIPAddress: {
+            id: ipFirewall.id
+          }
+          subnet: {
+            id: '${vnetHub.id}/subnets/AzureFirewallSubnet'
+          }
+        }
+      }
+    ]
+    firewallPolicy: {
+      id: fwPols.outputs.polIdMain
+    }
   }
 }
