@@ -1,8 +1,13 @@
 param policyId string
 param ipgs object
 
+resource policy 'Microsoft.Network/firewallPolicies@2021-05-01' existing = {
+  name: last(split(policyId,'/'))
+}
+
 resource netrc 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-05-01' = {
-  name: '${last(split(policyId,'/'))}/DefaultNetworkRuleCollectionGroup'
+  name: 'DefaultNetworkRuleCollectionGroup'
+  parent: policy
   properties: {
     priority: 1000
     ruleCollections: [
@@ -21,10 +26,10 @@ resource netrc 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-05-
               'Any'
             ]
             sourceIpGroups: [
-              ipgs.outputs.ipgIdAzureVnets
+              ipgs.ipgIdAzureVnets
             ]
             destinationIpGroups: [
-              ipgs.outputs.ipgIdOnPremSubnets
+              ipgs.ipgIdOnPremSubnets
             ]
             destinationPorts: [
               '*'

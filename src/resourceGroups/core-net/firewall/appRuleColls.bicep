@@ -1,8 +1,13 @@
 param policyId string
 param ipgs object
 
+resource policy 'Microsoft.Network/firewallPolicies@2021-05-01' existing = {
+  name: last(split(policyId,'/'))
+}
+
 resource apprc 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-05-01' = {
-  name: '${last(split(policyId,'/'))}/DefaultApplicationRuleCollectionGroup'
+  name: 'DefaultApplicationRuleCollectionGroup'
+  parent: policy
   properties: {
     priority: 1000
     ruleCollections: [
@@ -29,7 +34,7 @@ resource apprc 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-05-
             ]
             terminateTLS: false
             sourceIpGroups: [
-              ipgs.outputs.ipgIdAzureVnets
+              ipgs.ipgIdAzureVnets
             ]
             targetFqdns: [
               '*.github.com'

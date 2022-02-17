@@ -1,8 +1,13 @@
 param policyId string
 param ipgs object
 
+resource policy 'Microsoft.Network/firewallPolicies@2021-05-01' existing = {
+  name: last(split(policyId,'/'))
+}
+
 resource dnatrc 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-05-01' = {
-  name: '${last(split(policyId,'/'))}/DefaultDnatRuleCollectionGroup'
+  name: 'DefaultDnatRuleCollectionGroup'
+  parent: policy
   properties: {
     priority: 1000
     ruleCollections: [
