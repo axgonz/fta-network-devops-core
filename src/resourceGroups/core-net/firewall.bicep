@@ -8,13 +8,6 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
   name: '${config.hub.name}'
 }
 
-module fwPols 'firewall/policies.bicep' = {
-  name: '${shortLocation}-${name}-policies'
-  params: {
-    config: config
-  }
-}
-
 resource ipFirewall 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
   name: '${shortLocation}-${name}-ip'
   location: location
@@ -26,6 +19,14 @@ resource ipFirewall 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
     publicIPAddressVersion: 'IPv4'
     publicIPAllocationMethod: 'Static'
     idleTimeoutInMinutes: 4
+  }
+}
+
+module fwPols 'firewall/policies.bicep' = {
+  name: '${shortLocation}-${name}-policies'
+  params: {
+    config: config
+    firewallPublicIpAddress: ipFirewall.properties.ipAddress
   }
 }
 

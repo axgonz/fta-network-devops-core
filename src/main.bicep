@@ -34,18 +34,6 @@ module depCoreNet 'resourceGroups/core-net/network.bicep' = {
   }
 }
 
-module depCoreNetPeerings 'resourceGroups/core-net/peerings.bicep' = if (!onlySpokeTemplates) {
-  name: '${rgCoreNet.name}-peerings'
-  scope: rgCoreNet
-  params: {
-    config: config
-    allowGatewayTransit: false
-  }  
-  dependsOn: [
-    depCoreNet
-  ]
-} 
-
 module depCoreNetBastion 'resourceGroups/core-net/bastion.bicep' = if (!onlySpokeTemplates) {
   name: '${rgCoreNet.name}-bastion'
   scope: rgCoreNet
@@ -75,5 +63,18 @@ module depCoreNetFirewall'resourceGroups/core-net/firewall.bicep' = if (!onlySpo
 //     config: config
 //   }
 // }
+
+module depCoreNetPeerings 'resourceGroups/core-net/peerings.bicep' = if (!onlySpokeTemplates) {
+  name: '${rgCoreNet.name}-peerings'
+  scope: rgCoreNet
+  params: {
+    config: config
+    allowGatewayTransit: false
+  }  
+  dependsOn: [
+    depCoreNet
+    // depCoreNetGateway
+  ]
+} 
 
 output vnetId_hub string = depCoreNet.outputs.vnetId_hub
