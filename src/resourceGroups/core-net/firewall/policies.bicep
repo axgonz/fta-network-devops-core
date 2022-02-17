@@ -31,11 +31,11 @@ resource rcgDnat 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-0
   name: 'DefaultDnatRuleCollectionGroup'
   parent: polMain
   properties: {
-    priority: 1000
+    priority: 100
     ruleCollections: [
       {
         name: 'website'
-        priority: 200
+        priority: 1000
         ruleCollectionType: 'FirewallPolicyNatRuleCollection'
         action: {
           type: 'DNAT'
@@ -69,11 +69,11 @@ resource rcgNetwork 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@202
   name: 'DefaultNetworkRuleCollectionGroup'
   parent: polMain
   properties: {
-    priority: 1000
+    priority: 200
     ruleCollections: [
       {
         name: 'basic'
-        priority: 200
+        priority: 1000
         ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
         action: {
           type: 'Allow'
@@ -124,7 +124,7 @@ resource rcgApplication 'Microsoft.Network/firewallPolicies/ruleCollectionGroups
   name: 'DefaultApplicationRuleCollectionGroup'
   parent: polMain
   properties: {
-    priority: 1000
+    priority: 300
     ruleCollections: [
       {
         name: 'SafeSites'
