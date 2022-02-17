@@ -2,7 +2,7 @@ param policy object
 param ipgs object
 
 resource netrc 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-05-01' = {
-  name: '${policy.name}/DefaultNetworkRuleCollectionGroup'
+  name: '${last(split(policy.id,'/'))}/DefaultNetworkRuleCollectionGroup'
   properties: {
     priority: 1000
     ruleCollections: [
