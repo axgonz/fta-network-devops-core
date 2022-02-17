@@ -29,7 +29,7 @@ module ipgs 'ipgroups.bicep' = {
 module netrc 'netRuleColls.bicep' = {
   name: '${shortLocation}-${name}-netrulecollections'
   params: {
-    policy: polMain
+    policyId: polMain.id
     ipgs: ipgs
   }
 }
@@ -37,7 +37,7 @@ module netrc 'netRuleColls.bicep' = {
 module apprc 'appRuleColls.bicep' = {
   name: '${shortLocation}-${name}-apprulecollections'
   params: {
-    policy: polMain
+    policyId: polMain.id
     ipgs: ipgs
   }
 }
@@ -45,7 +45,7 @@ module apprc 'appRuleColls.bicep' = {
 module dnatrc 'dnatRuleColls.bicep' = {
   name: '${shortLocation}-${name}-dnatrulecollections'
   params: {
-    policy: polMain
+    policyId: polMain.id
     ipgs: ipgs
   }
 }
