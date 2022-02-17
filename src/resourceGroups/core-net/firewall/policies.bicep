@@ -1,9 +1,11 @@
+param config object
 param location string = resourceGroup().location
 
+var shortLocation = config.regionPrefixLookup[location]
 var name = 'pol-main'
 
 resource polMain 'Microsoft.Network/firewallPolicies@2021-05-01' = {
-  name: name
+  name: '${shortLocation}-${name}'
   location: location
   properties: {
      sku: {
@@ -18,11 +20,14 @@ resource polMain 'Microsoft.Network/firewallPolicies@2021-05-01' = {
 }
 
 module ipgs 'ipgroups.bicep' = {
-  name: '${name}-ipgs'
+  name: '${shortLocation}-${name}-ipgs'
+  params: {
+    config: config
+  }
 }
 
 module netrc 'netRuleColls.bicep' = {
-  name: '${name}-netrulecollections'
+  name: '${shortLocation}-${name}-netrulecollections'
   params: {
     policy: polMain
     ipgs: ipgs
@@ -30,7 +35,7 @@ module netrc 'netRuleColls.bicep' = {
 }
 
 module apprc 'appRuleColls.bicep' = {
-  name: '${name}-apprulecollections'
+  name: '${shortLocation}-${name}-apprulecollections'
   params: {
     policy: polMain
     ipgs: ipgs
@@ -38,7 +43,7 @@ module apprc 'appRuleColls.bicep' = {
 }
 
 module dnatrc 'dnatRuleColls.bicep' = {
-  name: '${name}-dnatrulecollections'
+  name: '${shortLocation}-${name}-dnatrulecollections'
   params: {
     policy: polMain
     ipgs: ipgs

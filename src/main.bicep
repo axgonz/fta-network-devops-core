@@ -43,28 +43,33 @@ module depCoreNetPeerings 'resourceGroups/core-net/peerings.bicep' = if (!onlySp
   }  
   dependsOn: [
     depCoreNet
-    //depCoreNetGateway
   ]
 } 
 
+module depCoreNetBastion 'resourceGroups/core-net/bastion.bicep' = if (!onlySpokeTemplates) {
+  name: '${rgCoreNet.name}-bastion'
+  scope: rgCoreNet
+  params: {
+    config: config
+  }
+  dependsOn: [
+    depCoreNet
+  ]
+}
+
+module depCoreNetFirewall'resourceGroups/core-net/firewall.bicep' = if (!onlySpokeTemplates) {
+  name: '${rgCoreNet.name}-firewall'
+  scope: rgCoreNet
+  params: {
+    config: config
+  }
+  dependsOn: [
+    depCoreNet
+  ]
+}
+
 // module depCoreNetGateway 'resourceGroups/core-net/gateway.bicep' = if (!onlySpokeTemplates) {
 //   name: '${rgCoreNet.name}-gateway'
-//   scope: rgCoreNet
-//   params: {
-//     config: config
-//   }
-// }
-
-// module depCoreNetBastion 'resourceGroups/core-net/bastion.bicep' = if (!onlySpokeTemplates) {
-//   name: '${rgCoreNet.name}-bastion'
-//   scope: rgCoreNet
-//   params: {
-//     config: config
-//   }
-// }
-
-// module depCoreNetFirewall'resourceGroups/core-net/firewall.bicep' = if (!onlySpokeTemplates) {
-//   name: '${rgCoreNet.name}-firewall'
 //   scope: rgCoreNet
 //   params: {
 //     config: config

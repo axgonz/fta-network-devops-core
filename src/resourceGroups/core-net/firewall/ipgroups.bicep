@@ -1,7 +1,10 @@
+param config object
 param location string = resourceGroup().location
 
+var shortLocation = config.regionPrefixLookup[location]
+
 resource ipgAzureVnets 'Microsoft.Network/ipGroups@2021-05-01' = {
-  name: 'ipg-azureVnets'
+  name: '${shortLocation}-azureVnets'
   location: location
   properties: {
     ipAddresses: [
@@ -12,7 +15,7 @@ resource ipgAzureVnets 'Microsoft.Network/ipGroups@2021-05-01' = {
 }
 
 resource ipgOnPremSubnets 'Microsoft.Network/ipGroups@2021-05-01' = {
-  name: 'ipg-onpremSubnets'
+  name: '${shortLocation}-onpremSubnets'
   location: location
   properties: {
     ipAddresses: [

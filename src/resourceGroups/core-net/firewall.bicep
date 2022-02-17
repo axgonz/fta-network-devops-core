@@ -2,14 +2,17 @@ param config object
 param location string = resourceGroup().location
 
 var shortLocation = config.regionPrefixLookup[location]
-var name = 'azfw1'
+var name = 'firewall'
 
 resource vnetHub 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
   name: '${config.hub.name}'
 }
 
 module fwPols 'firewall/policies.bicep' = {
-  name: '${name}-policies'
+  name: '${shortLocation}-${name}-policies'
+  params: {
+    config: config
+  }
 }
 
 resource ipFirewall 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
@@ -27,7 +30,7 @@ resource ipFirewall 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
 }
 
 resource firewall 'Microsoft.Network/azureFirewalls@2021-05-01' = {
-  name: name
+  name: '${shortLocation}-${name}'
   location: location
   properties: {
     sku: {
