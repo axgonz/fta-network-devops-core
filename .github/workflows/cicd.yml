@@ -112,7 +112,7 @@ jobs:
         id: deployaue
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: aue-core-net-${{ steps.date.outputs.date }}
+          deploymentName: aue-core-net
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiaeast
@@ -125,7 +125,7 @@ jobs:
         id: deployase
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: ase-core-net-${{ steps.date.outputs.date }}
+          deploymentName: ase-core-net
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiasoutheast
@@ -137,7 +137,7 @@ jobs:
       - name: Peer aue hub to ase hub
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: aue-core-net-peerhubs-${{ steps.date.outputs.date }}
+          deploymentName: aue-core-net-peerhubs
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiaeast
@@ -147,7 +147,7 @@ jobs:
       - name: Peer ase hub to aue hub
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: ase-core-net-peerhubs-${{ steps.date.outputs.date }}
+          deploymentName: ase-core-net-peerhubs
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           region: australiasoutheast
@@ -162,7 +162,7 @@ jobs:
       - name: Seed APPA aue subscription
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: aue-core-net-${{ steps.date.outputs.date }}
+          deploymentName: aue-core-net
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_APPA }}
           region: australiaeast
@@ -172,7 +172,7 @@ jobs:
       - name: Seed APPA ase subscription
         uses: azure/arm-deploy@v1
         with:
-          deploymentName: ase-core-net-${{ steps.date.outputs.date }}
+          deploymentName: ase-core-net
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_APPA }}
           region: australiasoutheast
