@@ -25,6 +25,9 @@ resource polMain 'Microsoft.Network/firewallPolicies@2021-05-01' = {
        ipAddresses: []
      }
   }
+  dependsOn: [
+    ipgs
+  ]  
 }
 
 resource rcgDnat 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-05-01' = {

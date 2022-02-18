@@ -22,7 +22,7 @@ resource ipFirewall 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
   }
 }
 
-module fwPols 'firewall/policies.bicep' = {
+module fwPols 'fwpolicy.bicep' = {
   name: '${shortLocation}-${name}-policies'
   params: {
     config: config

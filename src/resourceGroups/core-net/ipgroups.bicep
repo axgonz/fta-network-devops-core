@@ -22,6 +22,9 @@ resource ipgOnPremSubnets 'Microsoft.Network/ipGroups@2021-05-01' = {
       '192.168.0.0/16'
     ]
   }
+  dependsOn: [
+    ipgAzureVnets
+  ]
 }
 
 output ipgIdAzureVnets string = ipgAzureVnets.id
