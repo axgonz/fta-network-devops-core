@@ -20,6 +20,14 @@ trigger:
     include:
       - src/*
 
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/*      
+
 pool: 
   vmImage: ubuntu-latest
   
@@ -42,6 +50,7 @@ stages:
             artifact: armtemplates     
 
   - stage: dev
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
     dependsOn:
       - build
     variables:
@@ -57,6 +66,7 @@ stages:
                   displayName: "Example build step."    
 
   - stage: uat
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     dependsOn:
       - build
     variables:
